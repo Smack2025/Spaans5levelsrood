@@ -31,6 +31,36 @@ export const SPANISH_WORDS: Word[] = [
 
   { id: 19, spanish_word: "filosofía", dutch_translation: "filosofie", image_url: "/philosophical-thinking.png", difficulty_level: 5 },
   { id: 20, spanish_word: "extraordinario", dutch_translation: "buitengewoon", image_url: "/extraordinary-moment.png", difficulty_level: 5 },
+
+  { id: 21, spanish_word: "pan", dutch_translation: "brood", image_url: "/placeholder.jpg", difficulty_level: 1 },
+  { id: 22, spanish_word: "leche", dutch_translation: "melk", image_url: "/placeholder.jpg", difficulty_level: 1 },
+  { id: 23, spanish_word: "nube", dutch_translation: "wolk", image_url: "/placeholder.jpg", difficulty_level: 1 },
+  { id: 24, spanish_word: "árbol", dutch_translation: "boom", image_url: "/placeholder.jpg", difficulty_level: 1 },
+  { id: 25, spanish_word: "sol", dutch_translation: "zon", image_url: "/placeholder.jpg", difficulty_level: 1 },
+
+  { id: 26, spanish_word: "coche", dutch_translation: "auto", image_url: "/placeholder-logo.png", difficulty_level: 2 },
+  { id: 27, spanish_word: "ciudad", dutch_translation: "stad", image_url: "/placeholder-logo.png", difficulty_level: 2 },
+  { id: 28, spanish_word: "dinero", dutch_translation: "geld", image_url: "/placeholder-logo.png", difficulty_level: 2 },
+  { id: 29, spanish_word: "salud", dutch_translation: "gezondheid", image_url: "/placeholder-logo.png", difficulty_level: 2 },
+  { id: 30, spanish_word: "música", dutch_translation: "muziek", image_url: "/placeholder-logo.png", difficulty_level: 2 },
+
+  { id: 31, spanish_word: "montaña", dutch_translation: "berg", image_url: "/placeholder-user.jpg", difficulty_level: 3 },
+  { id: 32, spanish_word: "playa", dutch_translation: "strand", image_url: "/placeholder-user.jpg", difficulty_level: 3 },
+  { id: 33, spanish_word: "bosque", dutch_translation: "bos", image_url: "/placeholder-user.jpg", difficulty_level: 3 },
+  { id: 34, spanish_word: "río", dutch_translation: "rivier", image_url: "/placeholder-user.jpg", difficulty_level: 3 },
+  { id: 35, spanish_word: "estrella", dutch_translation: "ster", image_url: "/placeholder-user.jpg", difficulty_level: 3 },
+
+  { id: 36, spanish_word: "universidad", dutch_translation: "universiteit", image_url: "/placeholder.svg", difficulty_level: 4 },
+  { id: 37, spanish_word: "tecnología", dutch_translation: "technologie", image_url: "/placeholder.svg", difficulty_level: 4 },
+  { id: 38, spanish_word: "historia", dutch_translation: "geschiedenis", image_url: "/placeholder.svg", difficulty_level: 4 },
+  { id: 39, spanish_word: "economía", dutch_translation: "economie", image_url: "/placeholder.svg", difficulty_level: 4 },
+  { id: 40, spanish_word: "psicología", dutch_translation: "psychologie", image_url: "/placeholder.svg", difficulty_level: 4 },
+
+  { id: 41, spanish_word: "metamorfosis", dutch_translation: "metamorfose", image_url: "/placeholder-yo73h.png", difficulty_level: 5 },
+  { id: 42, spanish_word: "hiperconectividad", dutch_translation: "hyperconnectiviteit", image_url: "/placeholder-yo73h.png", difficulty_level: 5 },
+  { id: 43, spanish_word: "conglomerado", dutch_translation: "conglomeraat", image_url: "/placeholder-yo73h.png", difficulty_level: 5 },
+  { id: 44, spanish_word: "paradigma", dutch_translation: "paradigma", image_url: "/placeholder-yo73h.png", difficulty_level: 5 },
+  { id: 45, spanish_word: "idiosincrasia", dutch_translation: "idiosyncrasie", image_url: "/placeholder-yo73h.png", difficulty_level: 5 },
 ]
 
 export function getWordsByDifficulty(difficultyLevel?: number): Word[] {
