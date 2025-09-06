@@ -340,13 +340,14 @@ export function SpanishLearningGame() {
                         key={option.text}
                         onClick={() => handleAnswer(option.text)}
                         disabled={showResult}
-                        className={`h-auto flex flex-col items-center p-4 gap-2 font-body ${
+                        variant={
                           showResult && option.text === currentWord.dutch
-                            ? "bg-green-500 text-white"
+                            ? "success"
                             : showResult && option.text === selectedAnswer
-                              ? "bg-red-500 text-white"
-                              : ""
-                        }`}
+                              ? "destructive"
+                              : undefined
+                        }
+                        className="h-auto flex flex-col items-center p-4 gap-2 font-body transition-colors"
                       >
                         <img
                           src={option.image}
