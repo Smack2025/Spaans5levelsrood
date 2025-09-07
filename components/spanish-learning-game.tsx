@@ -7,6 +7,7 @@ import { Loader2, Volume2, VolumeX, Sparkles } from "lucide-react"
 import { DifficultySelector } from "./difficulty-selector"
 import { AchievementSystem } from "./achievement-system"
 import { SoundManager } from "./sound-manager"
+import { WelcomeScreen } from "./welcome-screen"
 import { BrainrotCollection, getRandomCharacterToUnlock, BRAINROT_CHARACTERS } from "./italian-brainrot-characters"
 import { getWordsByDifficulty, SPANISH_WORDS } from "@/lib/words-data"
 
@@ -273,7 +274,13 @@ export function SpanishLearningGame() {
   const perfectGames = gameComplete && totalCorrect === words.length ? 1 : 0
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div
+      className={
+        gameMode === "welcome"
+          ? "min-h-screen"
+          : "min-h-screen flex items-center justify-center p-4"
+      }
+    >
       <SoundManager
         playCorrect={playCorrectSound && soundEnabled}
         playIncorrect={playIncorrectSound && soundEnabled}
@@ -282,13 +289,10 @@ export function SpanishLearningGame() {
       />
 
       {gameMode === "welcome" && (
-        <Card className="w-full max-w-md text-center">
-          <CardContent className="p-6">
-            <h1 className="text-3xl font-heading mb-4">Spaans Leren Game</h1>
-            <Button className="mr-2" onClick={() => setGameMode("select")}>Start</Button>
-            <Button variant="secondary" onClick={() => setGameMode("collection")}>Collectie</Button>
-          </CardContent>
-        </Card>
+        <WelcomeScreen
+          onStart={() => setGameMode("select")}
+          onCollection={() => setGameMode("collection")}
+        />
       )}
 
       {gameMode === "select" && (
