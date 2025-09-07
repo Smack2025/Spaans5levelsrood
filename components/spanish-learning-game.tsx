@@ -9,6 +9,9 @@ import { AchievementSystem } from "./achievement-system"
 import { SoundManager } from "./sound-manager"
 import { BrainrotCollection, getRandomCharacterToUnlock, BRAINROT_CHARACTERS } from "./italian-brainrot-characters"
 import { getWordsByDifficulty, SPANISH_WORDS } from "@/lib/words-data"
+import { VoiceIntro } from "./voice-intro"
+import { AvatarSelector } from "./avatar-selector"
+import { LevelMap } from "./level-map"
 
 interface GameWord {
   id: number
@@ -28,7 +31,9 @@ interface GameWord {
 }
 
 export function SpanishLearningGame() {
-  const [gameMode, setGameMode] = useState<"welcome" | "select" | "playing" | "collection">("welcome") // Added welcome mode as initial state
+  const [gameMode, setGameMode] = useState<
+    "welcome" | "select" | "playing" | "collection" | "map"
+  >("welcome")
   const [words, setWords] = useState<GameWord[]>([])
   const [loading, setLoading] = useState(false)
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
@@ -42,6 +47,9 @@ export function SpanishLearningGame() {
   const [playCorrectSound, setPlayCorrectSound] = useState(false)
   const [playIncorrectSound, setPlayIncorrectSound] = useState(false)
   const [playCompleteSound, setPlayCompleteSound] = useState(false)
+
+  const [avatar, setAvatar] = useState<string | null>(null)
+  const [currentDifficulty, setCurrentDifficulty] = useState<number | null>(null)
 
   const [unlockedCharacters, setUnlockedCharacters] = useState<string[]>([])
   const [newlyUnlockedCharacter, setNewlyUnlockedCharacter] = useState<string | null>(null)
@@ -81,19 +89,30 @@ export function SpanishLearningGame() {
   }, [])
 
   useEffect(() => {
-    if (speechSupported) {
-      speakWelcomeMessage()
-
-      // Multiple retry attempts to ensure audio plays
-      const retryTimers = [
-        setTimeout(() => speakWelcomeMessage(), 100),
-        setTimeout(() => speakWelcomeMessage(), 500),
-        setTimeout(() => speakWelcomeMessage(), 1000),
-      ]
-
-      return () => retryTimers.forEach((timer) => clearTimeout(timer))
+    const storedAvatar = localStorage.getItem("selected-avatar")
+    if (storedAvatar) {
+      setAvatar(storedAvatar)
     }
-  }, [speechSupported]) // Removed gameMode dependency to play on component mount
+  }, [])
+
+  useEffect(() => {
+    if (avatar) {
+      localStorage.setItem("selected-avatar", avatar)
+    }
+  }, [avatar])
+
+  useEffect(() => {
+    if (gameComplete && currentDifficulty) {
+      const stored = localStorage.getItem("completed-levels")
+      const completed: number[] = stored ? JSON.parse(stored) : []
+      if (!completed.includes(currentDifficulty)) {
+        completed.push(currentDifficulty)
+        localStorage.setItem("completed-levels", JSON.stringify(completed))
+      }
+    }
+  }, [gameComplete, currentDifficulty])
+
+  // Voice introduction handled by VoiceIntro component
 
   useEffect(() => {
     if (currentWord && speechSupported && gameMode === "playing" && !showResult) {
@@ -182,6 +201,7 @@ export function SpanishLearningGame() {
     setSelectedAnswer(null)
     setShowResult(false)
     setLoading(false)
+    setCurrentDifficulty(difficulty ?? null)
     setGameMode("playing")
   }
 
@@ -200,13 +220,6 @@ export function SpanishLearningGame() {
     utter.lang = "es-ES"
     utter.rate = 0.9
     utter.onend = () => setIsSpeaking(false)
-    window.speechSynthesis.speak(utter)
-  }
-
-  const speakWelcomeMessage = () => {
-    if (!speechSupported) return
-    const utter = new SpeechSynthesisUtterance("Bienvenido al juego de español")
-    utter.lang = "es-ES"
     window.speechSynthesis.speak(utter)
   }
 
@@ -274,6 +287,11 @@ export function SpanishLearningGame() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="fixed top-4 right-4">
+        {avatar && (
+          <img src={avatar} alt="avatar" className="w-12 h-12 rounded-full" />
+        )}
+      </div>
       <SoundManager
         playCorrect={playCorrectSound && soundEnabled}
         playIncorrect={playIncorrectSound && soundEnabled}
@@ -285,8 +303,21 @@ export function SpanishLearningGame() {
         <Card className="w-full max-w-md text-center">
           <CardContent className="p-6">
             <h1 className="text-3xl font-heading mb-4">Spaans Leren Game</h1>
-            <Button className="mr-2" onClick={() => setGameMode("select")}>Start</Button>
-            <Button variant="secondary" onClick={() => setGameMode("collection")}>Collectie</Button>
+            <AvatarSelector selected={avatar} onSelect={setAvatar} />
+            <Button className="mr-2" onClick={() => setGameMode("select")}>
+              Start
+            </Button>
+            <Button
+              variant="secondary"
+              className="mr-2"
+              onClick={() => setGameMode("collection")}
+            >
+              Collectie
+            </Button>
+            <Button variant="secondary" onClick={() => setGameMode("map")}>
+              Kaart
+            </Button>
+            <VoiceIntro />
           </CardContent>
         </Card>
       )}
@@ -378,6 +409,10 @@ export function SpanishLearningGame() {
           unlockedCharacters={unlockedCharacters}
           onClose={() => setGameMode("welcome")}
         />
+      )}
+
+      {gameMode === "map" && (
+        <LevelMap onClose={() => setGameMode("welcome")} />
       )}
 
       {showCharacterUnlock && newlyUnlockedCharacter && (
