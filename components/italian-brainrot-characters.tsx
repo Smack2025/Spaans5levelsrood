@@ -259,6 +259,35 @@ const BRAINROT_CHARACTERS: BrainrotCharacter[] = [
   },
 ]
 
+export function speakCharacterName(characterName: string) {
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel()
+
+    const utterance = new SpeechSynthesisUtterance(characterName)
+    utterance.lang = "es-US"
+    utterance.rate = 0.9
+    utterance.pitch = 1.8
+
+    const voices = window.speechSynthesis.getVoices()
+    const spanishVoice = voices.find(
+      (voice) =>
+        voice.lang.startsWith("es") &&
+        (voice.name.toLowerCase().includes("maria") ||
+          voice.name.toLowerCase().includes("carmen") ||
+          voice.name.toLowerCase().includes("sofia") ||
+          voice.name.toLowerCase().includes("isabella") ||
+          voice.name.toLowerCase().includes("female")),
+    )
+
+    if (spanishVoice) {
+      utterance.voice = spanishVoice
+    }
+
+    console.log(`[v0] Speaking character name: ${characterName}`)
+    window.speechSynthesis.speak(utterance)
+  }
+}
+
 interface BrainrotCollectionProps {
   unlockedCharacters: string[]
   onClose: () => void
@@ -286,39 +315,6 @@ export function BrainrotCollection({ unlockedCharacters, onClose }: BrainrotColl
         return "text-blue-500 border-blue-500"
       default:
         return "text-gray-500 border-gray-500"
-    }
-  }
-
-  const speakCharacterName = (characterName: string) => {
-    if ("speechSynthesis" in window) {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel()
-
-      const utterance = new SpeechSynthesisUtterance(characterName)
-
-      // Use Spanish-accented voice settings
-      utterance.lang = "es-US"
-      utterance.rate = 0.9
-      utterance.pitch = 1.8
-
-      // Try to find a Spanish female voice
-      const voices = window.speechSynthesis.getVoices()
-      const spanishVoice = voices.find(
-        (voice) =>
-          voice.lang.startsWith("es") &&
-          (voice.name.toLowerCase().includes("maria") ||
-            voice.name.toLowerCase().includes("carmen") ||
-            voice.name.toLowerCase().includes("sofia") ||
-            voice.name.toLowerCase().includes("isabella") ||
-            voice.name.toLowerCase().includes("female")),
-      )
-
-      if (spanishVoice) {
-        utterance.voice = spanishVoice
-      }
-
-      console.log(`[v0] Speaking character name: ${characterName}`)
-      window.speechSynthesis.speak(utterance)
     }
   }
 
@@ -456,6 +452,17 @@ export function getRandomCharacterToUnlock(alreadyUnlocked: string[]): string | 
   }
 
   return availableCharacters[0].id
+}
+
+export function maybeUnlockCharacter(
+  alreadyUnlocked: string[],
+  correctCount: number,
+  threshold = 3,
+): string | null {
+  if (correctCount > 0 && correctCount % threshold === 0) {
+    return getRandomCharacterToUnlock(alreadyUnlocked)
+  }
+  return null
 }
 
 export { BRAINROT_CHARACTERS }

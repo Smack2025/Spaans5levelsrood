@@ -3,11 +3,16 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Loader2, Volume2, VolumeX, Sparkles } from "lucide-react"
+import { Loader2, Volume2, VolumeX } from "lucide-react"
 import { DifficultySelector } from "./difficulty-selector"
 import { AchievementSystem } from "./achievement-system"
 import { SoundManager } from "./sound-manager"
-import { BrainrotCollection, getRandomCharacterToUnlock, BRAINROT_CHARACTERS } from "./italian-brainrot-characters"
+import {
+  BrainrotCollection,
+  BRAINROT_CHARACTERS,
+  maybeUnlockCharacter,
+  speakCharacterName,
+} from "./italian-brainrot-characters"
 import { getWordsByDifficulty, SPANISH_WORDS } from "@/lib/words-data"
 
 interface GameWord {
@@ -210,16 +215,6 @@ export function SpanishLearningGame() {
     window.speechSynthesis.speak(utter)
   }
 
-  const maybeUnlockCharacter = () => {
-    const char = getRandomCharacterToUnlock(unlockedCharacters)
-    if (char) {
-      setUnlockedCharacters([...unlockedCharacters, char.id])
-      setNewlyUnlockedCharacter(char.id)
-      setShowCharacterUnlock(true)
-      setTimeout(() => setShowCharacterUnlock(false), 2000)
-    }
-  }
-
   const handleAnswer = (option: string) => {
     if (showResult || !currentWord) return
     const correct = option === currentWord.dutch
@@ -237,12 +232,23 @@ export function SpanishLearningGame() {
       },
     ])
     if (correct) {
-      setScore(score + 1)
+      const newScore = score + 1
+      setScore(newScore)
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak > maxStreak) setMaxStreak(newStreak)
       if (soundEnabled) setPlayCorrectSound(true)
-      maybeUnlockCharacter()
+
+      const unlockedId = maybeUnlockCharacter(unlockedCharacters, newScore)
+      if (unlockedId) {
+        setUnlockedCharacters([...unlockedCharacters, unlockedId])
+        setNewlyUnlockedCharacter(unlockedId)
+        const unlockedChar = BRAINROT_CHARACTERS.find((c) => c.id === unlockedId)
+        if (unlockedChar) {
+          speakCharacterName(unlockedChar.name)
+        }
+        setShowCharacterUnlock(true)
+      }
     } else {
       setStreak(0)
       if (soundEnabled) setPlayIncorrectSound(true)
@@ -382,14 +388,34 @@ export function SpanishLearningGame() {
 
       {showCharacterUnlock && newlyUnlockedCharacter && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <Card className="p-6 text-center">
-            <Sparkles className="w-10 h-10 text-yellow-500 mb-2" />
-            <p className="font-heading mb-2">Nieuw personage vrijgespeeld!</p>
-            <p className="font-body mb-4">
-              {BRAINROT_CHARACTERS.find((c) => c.id === newlyUnlockedCharacter)?.name}
-            </p>
-            <Button onClick={() => setShowCharacterUnlock(false)}>Sluiten</Button>
-          </Card>
+          {(() => {
+            const char = BRAINROT_CHARACTERS.find((c) => c.id === newlyUnlockedCharacter)
+            if (!char) return null
+            return (
+              <Card className="p-6 text-center animate-in fade-in-50">
+                <img
+                  src={char.image}
+                  alt={char.name}
+                  className="w-32 h-32 mx-auto mb-4 animate-bounce"
+                />
+                <p className="font-heading text-xl mb-2">Gefeliciteerd!</p>
+                <p className="font-body mb-4">{char.name} is vrijgespeeld!</p>
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    onClick={() => {
+                      setShowCharacterUnlock(false)
+                      setGameMode("collection")
+                    }}
+                  >
+                    Bekijk collectie
+                  </Button>
+                  <Button variant="secondary" onClick={() => setShowCharacterUnlock(false)}>
+                    Verder spelen
+                  </Button>
+                </div>
+              </Card>
+            )
+          })()}
         </div>
       )}
     </div>
